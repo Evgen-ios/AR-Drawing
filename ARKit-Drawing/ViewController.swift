@@ -144,10 +144,25 @@ class ViewController: UIViewController {
         }
     }
     
-    func reloadConfiguration() {
+    func reloadConfiguration(reset: Bool = false) {
+        // Clear objects placed
+        objectsPlaced.forEach { $0.removeFromParentNode() }
+        objectsPlaced.removeAll()
+        
+        // Clear placed planes
+        planeNodes.forEach { $0.removeFromParentNode() }
+        planeNodes.removeAll()
+        
+        // Hide all future planes
+        arePlanesHidden = false
+        
+        // Remove existing anchors if reset is true
+        let option: ARSession.RunOptions = reset ? .removeExistingAnchors : []
+        
+        // Reload configuration
         configuration.detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)
         configuration.planeDetection = .horizontal
-        sceneView.session.run(configuration)
+        sceneView.session.run(configuration, options: option)
     }
     
     
@@ -215,11 +230,16 @@ extension ViewController: OptionsViewControllerDelegate {
     }
     
     func undoLastObject() {
-        print(#line, #function)
+        if let lastObject = objectsPlaced.last {
+            lastObject.removeFromParentNode()
+            objectsPlaced.removeLast()
+        } else {
+            dismiss(animated: true)
+        }
     }
     
     func resetScene() {
-        print(#line, #function)
+        reloadConfiguration(reset: true)
         dismiss(animated: true, completion: nil)
     }
 }
@@ -243,7 +263,7 @@ extension ViewController: ARSCNViewDelegate {
     func nodeAdded(_ node: SCNNode, for anchor: ARImageAnchor) {
         // Pur a lane at the image
         let size = anchor.referenceImage.physicalSize
-        let coverNode = createFloor(with: size, opacity: 1)
+        let coverNode = createFloor(with: size, opacity: 0.1)
         coverNode.name = "image"
         node.addChildNode(coverNode)
     }
