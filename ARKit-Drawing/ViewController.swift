@@ -247,7 +247,7 @@ extension ViewController: OptionsViewControllerDelegate {
 // MARK: - ARSessionDelegate
 extension ViewController: ARSCNViewDelegate {
     
-    func createFloor(with size: CGSize, opacity: CGFloat = 0.35) -> SCNNode {
+    func createFloor(with size: CGSize, opacity: CGFloat = 0.01) -> SCNNode {
         
         let plane = SCNPlane(width: size.width, height: size.height)
         plane.firstMaterial?.diffuse.contents = UIColor.green
@@ -263,7 +263,7 @@ extension ViewController: ARSCNViewDelegate {
     func nodeAdded(_ node: SCNNode, for anchor: ARImageAnchor) {
         // Pur a lane at the image
         let size = anchor.referenceImage.physicalSize
-        let coverNode = createFloor(with: size, opacity: 0.1)
+        let coverNode = createFloor(with: size, opacity: 0.01)
         coverNode.name = "image"
         node.addChildNode(coverNode)
     }
